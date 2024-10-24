@@ -1,0 +1,28 @@
+module memory_multiplier(
+  input logic clk,
+  input logic rst_n,
+  input logic w_en,
+  input logic r_en,
+  input logic [1:0] addr,
+  input logic [15:0] data_in,
+  output logic [15:0] mem_out
+);
+
+  logic [15:0] memory [3:0];
+  int i;
+
+  always_ff @(posedge clk or negedge rst_n) begin
+    if(!rst_n) begin
+      for(i = 0; i < 4; i = i+1) begin
+        memory[i] = 16'b0;
+      end
+    end
+    if (w_en) begin
+      memory[addr] <= data_in; // Store inputs and result into memory
+    end
+    else if (r_en) begin
+      mem_out <= memory[addr]; // Read from memory
+    end
+  end
+
+endmodule

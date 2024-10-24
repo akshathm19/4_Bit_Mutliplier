@@ -1,0 +1,139 @@
+module tb_multiplier;
+    logic [3:0] A, B;         
+    logic [1:0] addr;      
+    logic clk, rst_n, w_en, r_en;  
+    logic [7:0] result;   
+    logic [15:0] data_in;     
+    logic [15:0] mem_out;   
+
+    // Instantiate the multiplier
+    multiplier_4bit dut (
+        .A(A),
+        .B(B),
+        .result(result)
+    );
+
+    memory_multiplier mem_inst (
+        .clk(clk),
+        .addr(addr),
+        .data_in(data_in),
+        .mem_out(mem_out),
+        .w_en(w_en),
+        .r_en(r_en),
+	.rst_n(rst_n)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        // Initialize waveform dump
+        $dumpfile("tb_multiplier.vcd");
+        $dumpvars(0, tb_multiplier);
+
+        // Display header
+        $display("Time | A  | B  | Product | Memory Address | Data In          | Data Out");
+        $display("---------------------------------------------------------------------");
+
+        // Test case 1: Multiply 3 and 2
+        A = 3; // A = 3
+        B = 2; // B = 2
+        #10; // Wait 10 time units
+
+        // Store the inputs and result in memory
+	rst_n = 0;
+	#10;
+	rst_n = 1;
+	#10;
+        w_en = 1;
+        addr = 2'b00;
+        data_in = {A, B, result};
+        #10; 
+        w_en = 0;
+
+        // Now read the data back
+        r_en = 1;
+        #10; 
+        $display("%0t  | %0d  | %0d  | %0d       | %0d             | %0b   | %0b",
+                 $time, A, B, result, addr, data_in, mem_out);
+        r_en = 0;
+
+        // Test case 2: Multiply 4 and 5
+        A = 4; 
+        B = 5; 
+        #10;
+
+        // Store the new inputs and result in memory
+	rst_n = 0;
+	#10;
+	rst_n = 1;
+	#10;
+        w_en = 1;
+        addr = 2'b01;
+        data_in = {A, B, result};
+        #10; 
+	w_en = 0;
+
+        // Now read the data back
+        r_en = 1;
+        #10; 
+        $display("%0t  | %0d  | %0d  | %0d       | %0d             | %0b   | %0b",
+                 $time, A, B, result, addr, data_in, mem_out);
+	r_en = 0;   
+
+        // Test case 3: Multiply 7 and 3
+        A = 7; 
+        B = 3;
+        #10; 
+
+        // Store the new inputs and result in memory
+	
+	rst_n = 0;
+	#10;
+	rst_n = 1;
+	#10;
+        w_en = 1;
+        addr = 2'b10;
+        data_in = {A, B, result};
+        #10;
+	w_en = 0;
+
+        // Now read the data back
+        r_en = 1;
+        #10; 
+        $display("%0t  | %0d  | %0d  | %0d       | %0d             | %0b   | %0b",
+                 $time, A, B, result, addr, data_in, mem_out);
+	r_en = 0;
+
+        // Test case 4: Multiply 8 and 9
+        A = 8; 
+        B = 9;
+        #10; 
+
+        // Store the new inputs and result in memory
+	
+	rst_n = 0;
+	#10;
+	rst_n = 1;
+	#10;
+        w_en = 1;
+        addr = 2'b11;
+        data_in = {A, B, result};
+        #10; 
+	w_en = 0;
+
+        // Now read the data back
+        r_en = 1;
+        #10; 
+        $display("%0t  | %0d  | %0d  | %0d       | %0d             | %0b   | %0b",
+                 $time,A, B, result, addr, data_in, mem_out);
+
+        // Disable write enable and stop the test
+	r_en = 0;
+        w_en = 0;
+        #10;
+        $finish;
+    end
+endmodule
